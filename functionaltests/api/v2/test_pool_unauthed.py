@@ -31,8 +31,7 @@ class PoolTest(DesignateV2Test):
         self.increase_quotas(user='admin')
         self.authed_client = PoolClient.as_user('admin')
         self.client = PoolClient.as_user('admin', with_token=False)
-        self.fixture = self.useFixture(PoolFixture(user='default'))
-        self.pool = None
+        self.fixture = self.useFixture(PoolFixture(user='admin'))
 
     """
     def tearDown(self):
