@@ -27,9 +27,9 @@ class PoolTest(DesignateV2Test):
 
     def setUp(self):
         super(PoolTest, self).setUp()
-        self.increase_quotas(user='default')
-        self.authed_client = PoolClient.as_user('default')
-        self.client = PoolClient.as_user('default', with_token=False)
+        self.increase_quotas(user='admin')
+        self.authed_client = PoolClient.as_user('admin')
+        self.client = PoolClient.as_user('admin', with_token=False)
         self.pool = None
 
     def tearDown(self):
