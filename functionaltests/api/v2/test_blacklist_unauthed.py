@@ -17,26 +17,28 @@ limitations under the License.
 from tempest_lib import exceptions
 
 from functionaltests.common import datagen
-from functionaltests.common import utils
 from functionaltests.api.v2.base import DesignateV2Test
 from functionaltests.api.v2.clients.blacklist_client import BlacklistClient
+from functionaltests.api.v2.fixtures import BlacklistFixture
 
 
-@utils.parameterized_class
 class BlacklistTest(DesignateV2Test):
 
     def setUp(self):
         super(BlacklistTest, self).setUp()
-        self.increase_quotas(user='default')
-        self.authed_client = BlacklistClient.as_user('admin')
+        self.increase_quotas(user='admin')
+        # self.authed_client = BlacklistClient.as_user('admin')
         self.client = BlacklistClient.as_user('admin', with_token=False)
-        self.blacklist = None
+        # self.blacklist = None
+        self.fixture = self.useFixture(BlacklistFixture(user='admin'))
 
+    """
     def tearDown(self):
         super(BlacklistTest, self).tearDown()
         if self.blacklist:
             resp, self.blacklist = self.authed_client.delete_blacklist(
                 self.blacklist.id)
+    """
 
     def test_create_blacklist(self):
         self.assertRaises(
@@ -48,11 +50,13 @@ class BlacklistTest(DesignateV2Test):
             exceptions.Unauthorized, self.client.get_blacklist, 'junk')
 
     def test_get_existing_blacklist(self):
+        """
         resp, self.blacklist = self.authed_client.post_blacklist(
             datagen.random_blacklist_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.get_blacklist,
-            self.blacklist.id)
+            self.fixture.created_blacklist.id)
 
     def test_list_blacklists(self):
         self.assertRaises(
@@ -64,19 +68,23 @@ class BlacklistTest(DesignateV2Test):
             datagen.random_blacklist_data())
 
     def test_update_existing_blacklist(self):
+        """
         resp, self.blacklist = self.authed_client.post_blacklist(
             datagen.random_blacklist_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.patch_blacklist,
-            self.blacklist.id, datagen.random_blacklist_data())
+            self.fixture.created_blacklist.id, datagen.random_blacklist_data())
 
     def test_delete_fake_blacklist(self):
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_blacklist, 'junk')
 
     def test_delete_existing_blacklist(self):
+        """
         resp, self.blacklist = self.authed_client.post_blacklist(
             datagen.random_blacklist_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_blacklist,
-            self.blacklist.id)
+            self.fixture.created_blacklist.id)
