@@ -20,6 +20,7 @@ from functionaltests.common import datagen
 from functionaltests.common import utils
 from functionaltests.api.v2.base import DesignateV2Test
 from functionaltests.api.v2.clients.zone_client import ZoneClient
+from functionaltests.api.v2.fixtures import ZoneFixture
 
 
 @utils.parameterized_class
@@ -30,12 +31,15 @@ class ZoneTest(DesignateV2Test):
         self.increase_quotas(user='default')
         self.authed_client = ZoneClient.as_user('default')
         self.client = ZoneClient.as_user('default', with_token=False)
+        self.fixture = self.useFixture(ZoneFixture(user='default'))
         self.zone = None
 
+    """
     def tearDown(self):
         super(ZoneTest, self).tearDown()
         if self.zone:
             resp, self.zone = self.authed_client.delete_zone(self.zone.id)
+    """
 
     def test_create_zone(self):
         self.assertRaises(
@@ -47,10 +51,13 @@ class ZoneTest(DesignateV2Test):
             exceptions.Unauthorized, self.client.get_zone, 'junk')
 
     def test_get_existing_zone(self):
+        """
         resp, self.zone = self.authed_client.post_zone(
             datagen.random_zone_data())
+        """
         self.assertRaises(
-            exceptions.Unauthorized, self.client.get_zone, self.zone.id)
+            exceptions.Unauthorized, self.client.get_zone,
+            self.fixture.created_zone.id)
 
     def test_list_zones(self):
         self.assertRaises(
@@ -62,19 +69,23 @@ class ZoneTest(DesignateV2Test):
             datagen.random_zone_data())
 
     def test_update_existing_zone(self):
+        """
         resp, self.zone = self.authed_client.post_zone(
             datagen.random_zone_data())
+        """
         self.assertRaises(
-            exceptions.Unauthorized, self.client.patch_zone, self.zone.id,
-            datagen.random_zone_data())
+            exceptions.Unauthorized, self.client.patch_zone,
+            self.fixture.created_zone.id, datagen.random_zone_data())
 
     def test_delete_fake_zone(self):
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_zone, 'junk')
 
     def test_delete_existing_zone(self):
+        """
         resp, self.zone = self.authed_client.post_zone(
             datagen.random_zone_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_zone,
-            self.zone.id)
+            self.fixture.created_zone.id)

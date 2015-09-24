@@ -20,6 +20,7 @@ from functionaltests.common import datagen
 from functionaltests.common import utils
 from functionaltests.api.v2.base import DesignateV2Test
 from functionaltests.api.v2.clients.pool_client import PoolClient
+from functionaltests.api.v2.fixtures import PoolFixture
 
 
 @utils.parameterized_class
@@ -30,13 +31,16 @@ class PoolTest(DesignateV2Test):
         self.increase_quotas(user='admin')
         self.authed_client = PoolClient.as_user('admin')
         self.client = PoolClient.as_user('admin', with_token=False)
+        self.fixture = self.useFixture(PoolFixture(user='default'))
         self.pool = None
 
+    """
     def tearDown(self):
         super(PoolTest, self).tearDown()
         if self.pool:
             resp, self.pool = self.authed_client.delete_pool(
                 self.pool.id)
+    """
 
     def test_create_pool(self):
         self.assertRaises(
@@ -48,11 +52,13 @@ class PoolTest(DesignateV2Test):
             exceptions.Unauthorized, self.client.get_pool, 'junk')
 
     def test_get_existing_pool(self):
+        """
         resp, self.pool = self.authed_client.post_pool(
             datagen.random_pool_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.get_pool,
-            self.pool.id)
+            self.fixture.created_pool.id)
 
     def test_list_pools(self):
         self.assertRaises(
@@ -64,19 +70,23 @@ class PoolTest(DesignateV2Test):
             datagen.random_pool_data())
 
     def test_update_existing_pool(self):
+        """
         resp, self.pool = self.authed_client.post_pool(
             datagen.random_pool_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.patch_pool,
-            self.pool.id, datagen.random_pool_data())
+            self.fixture.created_pool.id, datagen.random_pool_data())
 
     def test_delete_fake_pool(self):
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_pool, 'junk')
 
     def test_delete_existing_pool(self):
+        """
         resp, self.pool = self.authed_client.post_pool(
             datagen.random_pool_data())
+        """
         self.assertRaises(
             exceptions.Unauthorized, self.client.delete_pool,
-            self.pool.id)
+            self.fixture.created_pool.id)
