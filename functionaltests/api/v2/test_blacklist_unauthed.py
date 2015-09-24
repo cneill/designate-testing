@@ -28,8 +28,8 @@ class BlacklistTest(DesignateV2Test):
     def setUp(self):
         super(BlacklistTest, self).setUp()
         self.increase_quotas(user='default')
-        self.authed_client = BlacklistClient.as_user('default')
-        self.client = BlacklistClient.as_user('default', with_token=False)
+        self.authed_client = BlacklistClient.as_user('admin')
+        self.client = BlacklistClient.as_user('admin', with_token=False)
         self.blacklist = None
 
     def tearDown(self):
@@ -48,7 +48,8 @@ class BlacklistTest(DesignateV2Test):
             exceptions.Unauthorized, self.client.get_blacklist, 'junk')
 
     def test_get_existing_blacklist(self):
-        resp, self.blacklist = self.authed_client.post_blacklist()
+        resp, self.blacklist = self.authed_client.post_blacklist(
+            datagen.random_blacklist_data())
         self.assertRaises(
             exceptions.Unauthorized, self.client.get_blacklist,
             self.blacklist.id)
